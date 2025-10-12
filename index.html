@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script async src="script.js"></script>
+
+
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="logo">🌐 CryptoChapter</div>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">About Us</a>
+            <a href="#">Services</a>
+            <a href="#">Blog</a>
+            <a href="#">Contact Us</a>
+            <button class="connect-wallet">Connect Wallet</button>
+        </nav>
+    </header>
+
+
+
+    <!-- Live Crypto Prices (moved below header) -->
+    <section class="crypto-prices" style="margin-bottom: 0;">
+        <h2>Live Crypto Prices</h2>
+        <div id="pricesContainer">
+            <!-- Prices will be loaded here -->
+        </div>
+        <div class="chart-controls">
+            <label for="coinSelect"><strong>Show 7d Chart for:</strong></label>
+            <select id="coinSelect">
+                <option value="bitcoin">Bitcoin (BTC)</option>
+                <option value="ethereum">Ethereum (ETH)</option>
+                <option value="binancecoin">BNB</option>
+                <option value="solana">Solana (SOL)</option>
+                <option value="ripple">XRP</option>
+                <option value="cardano">Cardano (ADA)</option>
+                <option value="dogecoin">Dogecoin (DOGE)</option>
+                <option value="tron">TRON (TRX)</option>
+                <option value="polygon">Polygon (MATIC)</option>
+                <option value="polkadot">Polkadot (DOT)</option>
+                <option value="litecoin">Litecoin (LTC)</option>
+            </select>
+        </div>
+        <h3 id="chartTitle">Bitcoin Price Chart (7d)</h3>
+        <canvas id="cryptoChart" width="400" height="200"></canvas>
+    </section>
+
+    <!-- Main Section -->
+    <main>
+        <section class="hero">
+            <p class="secure">🔒 Secure & Safe Crypto</p>
+            <h1>Smart Crypto Marketplace</h1>
+            <p class="description">Cryptocurrency websites are online platforms that provide information, services, and tools related to digital currencies, such as Bitcoin, Ethereum, and others</p>
+            <div class="buttons">
+                <button class="get-started">Get Started</button>
+                <button class="watch-video">Watch Video</button>
+            </div>
+            <img src="https://via.placeholder.com/300x200" alt="Crypto Coins" class="coins">
+            <div class="chart-icon">📈</div>
+        </section>
+
+        <!-- News Button -->
+        <button class="news-toggle">📰 Latest News</button>
+
+        <!-- News Pop-up -->
+        <div class="news-container" id="newsPopup">
+            <div class="news-header">
+                <h3>Latest Crypto News</h3>
+                <button class="close-news">✖</button>
+            </div>
+            <div class="news-content" id="newsContent">
+                <!-- News items will be added here dynamically -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2>Why Choose CryptoChapter?</h2>
+        <div class="features-list">
+            <div class="feature-item">🔒 Secure Transactions</div>
+            <div class="feature-item">⚡ Fast & Reliable</div>
+            <div class="feature-item">💸 Low Fees</div>
+            <div class="feature-item">🌍 Global Access</div>
+        </div>
+    </section>
+
+    <!-- Partners Section -->
+    <section class="partners">
+        <h2>Our Trusted Partners</h2>
+        <div class="partners-logos">
+            <img src="https://via.placeholder.com/100x40?text=Binance" alt="Binance">
+            <img src="https://via.placeholder.com/100x40?text=Coinbase" alt="Coinbase">
+            <img src="https://via.placeholder.com/100x40?text=Kraken" alt="Kraken">
+            <img src="https://via.placeholder.com/100x40?text=Gemini" alt="Gemini">
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <h2>What Our Users Say</h2>
+        <div class="testimonial-list">
+            <div class="testimonial-item">
+                <p>"CryptoChapter made crypto trading so easy and safe!"</p>
+                <span>- Alex, Trader</span>
+            </div>
+            <div class="testimonial-item">
+                <p>"The best platform for beginners and pros alike."</p>
+                <span>- Jamie, Investor</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-list">
+            <div class="faq-item">
+                <strong>How do I start trading?</strong>
+                <p>Just click "Get Started" and follow the simple steps to create your account.</p>
+            </div>
+            <div class="faq-item">
+                <strong>Is my wallet secure?</strong>
+                <p>Yes, we use industry-leading security protocols to keep your assets safe.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Signup -->
+    <section class="newsletter">
+        <h2>Stay Updated</h2>
+        <form class="newsletter-form">
+            <input type="email" placeholder="Enter your email" required>
+            <button type="submit">Subscribe</button>
+        </form>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>Follow Us On Social Media:</p>
+        <div class="social-icons">
+            <span>🌐</span>
+            <span>🐦</span>
+            <span>📷</span>
+        </div>
+    </footer>
+    <!--Chat Button-->
+    <button class="chat-bot-toggle">💬 Chat with Us</button>
+    <!-- Chat Interface-->
+     <div class="chat-bot-container" id="chatBot">
+        <div class="chat-header">
+          <h3>Chat with Bosa Bot</h3>
+          <button class="close-chat">✖</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <!--Messages will be added here dynamically-->
+        </div>
+        <div class="chat-input">
+          <input type="text" id="chatInput" placeholder="Type your question...">
+          <button id="sendMessage">Send</button>
+        </div>
+        
+     </div>
+
+  
+</body>
+</html>
