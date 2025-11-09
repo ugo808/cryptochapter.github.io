@@ -97,10 +97,10 @@
     const replyHTML = `
       We are not available right now.<br><br>
       You can contact us through:<br>
-      📱 <a href="https://wa.me/1234567890" target="_blank">WhatsApp</a><br>
-      💬 <a href="https://t.me/yourhandle" target="_blank">Telegram</a><br>
-      📘 <a href="https://facebook.com/yourpage" target="_blank">Facebook</a><br>
-      📸 <a href="https://instagram.com/yourhandle" target="_blank">Instagram</a>
+      📱 <a href="https://wa.me/2347066749320" target="_blank">WhatsApp</a><br>
+      💬 <a href="https://t.me/@Ugomiracle" target="_blank">Telegram</a><br>
+      📘 <a href="" target="_blank">Facebook</a><br>
+      📸 <a href="" target="_blank">Instagram</a>
     `;
     addMessage(replyHTML, 'bot-message', true);
   };
@@ -152,35 +152,63 @@
   fetchTickerPrices();
   setInterval(fetchTickerPrices, 60 * 1000);
 
-  // ----- Crypto News ----- //
-  let newsFetching = false;
-  const fetchCryptoNews = async () => {
-    if (!els.newsGrid || newsFetching) return;
-    newsFetching = true;
-    els.newsGrid.innerHTML = '<div class="news-loading">Loading latest crypto news...</div>';
-    try {
-      const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
-      const data = await res.json();
-      els.newsGrid.innerHTML = '';
-      if (data.Data?.length) {
-        data.Data.slice(0,20).forEach(news => {
-          const newsItem = document.createElement('div');
-          newsItem.className = 'news-item';
-          newsItem.innerHTML = `<strong>${news.title}</strong><p>${news.body}</p>`;
-          els.newsGrid.appendChild(newsItem);
+ // ----- Crypto News ----- //
+// ----- Crypto News ----- //
+let newsFetching = false;
+const fetchCryptoNews = async () => {
+  if (!els.newsGrid || newsFetching) return;
+  newsFetching = true;
+  els.newsGrid.innerHTML = '<div class="news-loading">Loading latest crypto news...</div>';
+
+  try {
+    const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
+    const data = await res.json();
+    els.newsGrid.innerHTML = '';
+
+    if (data.Data?.length) {
+      data.Data.slice(0, 20).forEach(news => {
+        const newsItem = document.createElement('article');
+        newsItem.className = 'news-item';
+
+        const imageUrl = news.imageurl || 'https://via.placeholder.com/150';
+        const publishedDate = new Date(news.published_on * 1000).toLocaleString();
+
+        newsItem.innerHTML = `
+          <img src="${imageUrl}" alt="${news.title}" class="news-image">
+          <h3>${news.title}</h3>
+          <p class="news-preview">${news.body.slice(0, 120)}...</p>
+          <p class="news-full hidden">${news.body}</p>
+          <p class="news-date">🕒 ${publishedDate}</p>
+          <button class="read-more-btn">Read More</button>
+        `;
+
+        els.newsGrid.appendChild(newsItem);
+      });
+
+      // Enable Read More / Read Less functionality
+      els.newsGrid.querySelectorAll('.read-more-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          const fullText = button.parentElement.querySelector('.news-full');
+          fullText.classList.toggle('hidden');
+          button.textContent = fullText.classList.contains('hidden') ? 'Read More' : 'Read Less';
         });
-      } else {
-        els.newsGrid.innerHTML = '<div class="news-loading">No news available at the moment.</div>';
-      }
-    } catch (err) {
-      console.error('Error fetching news:', err);
-      els.newsGrid.innerHTML = '<div class="news-error">⚠️ Unable to load news. Please try again later.</div>';
-    } finally {
-      newsFetching = false;
+      });
+    } else {
+      els.newsGrid.innerHTML = '<div class="news-loading">No news available at the moment.</div>';
     }
-  };
-  fetchCryptoNews();
-  setInterval(fetchCryptoNews, 5 * 60 * 1000);
+  } catch (err) {
+    console.error('Error fetching news:', err);
+    els.newsGrid.innerHTML = '<div class="news-error">⚠️ Unable to load news. Please try again later.</div>';
+  } finally {
+    newsFetching = false;
+  }
+};
+
+// Initial load and auto-refresh every 5 minutes
+fetchCryptoNews();
+setInterval(fetchCryptoNews, 5 * 60 * 1000);
+
+
 
   // ----- Dark Mode ----- //
   if (els.themeToggle) {
@@ -191,3 +219,7 @@
     });
   }
 })();
+
+
+
+
