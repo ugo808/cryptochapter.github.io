@@ -1,3 +1,10 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 /* --- ADVANCED STYLES --- */
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
@@ -1199,9 +1206,9 @@ footer {
 }
 
 .theme-btn {
-  background: #333;
+  background:none;
   border: none;
-  color: #fff;
+  color:none;
   padding: 8px 16px;
   border-radius: 20px;
   cursor: pointer;
@@ -1220,9 +1227,112 @@ body.dark-mode {
 body.dark-mode header,
 body.dark-mode nav,
 body.dark-mode .news-item {
-    background-color: #0d0c0c;
+    background-color: black;
     
 }
 
 
+
+
+
+
+.news-item {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  transition: transform 0.2s ease;
+}
+.news-item:hover {
+  transform: translateY(-3px);
+}
+.news-image {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+.news-title {
+  color: #00ffae;
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
+.news-body {
+  font-size: 0.9rem;
+  color: #ccc;
+}
+.news-time {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+
+
+
+
+
+
+/* News Section Expansion Styles */
+.latest-news {
+  padding: 40px 20px;
+  background: #8cc4ff;
+  color: #fff;
+  text-align: center;
+}
+
+.news-grid {
+  display: grid;
+  gap: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.news-item {
+  background: #e8d6d6;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: left;
+  text-decoration-color;background-blend-mode: color;
+  border-left: 4px solid #0b0c0b;
+  box-shadow: 0 2px 8px rgba(231, 238, 235, 0.05);
+  transition: transform 0.2s ease;
+}
+.news-item:hover {
+  transform: translateY(-4px);
+}
+
+.news-item h3 {
+  color: rgb(4, 224, 26);
+  margin-bottom: 8px;
+}
+
+.news-preview,
+.news-full {
+  line-height: 1.6;
+  margin-bottom: 10px;
+  color: #d9e3f0;
+}
+
+/* Hidden full content */
+.hidden {
+  display: none;
+}
+
+/* Read more button */
+.read-more-btn {
+  background: linear-gradient(90deg, #00ff95, #00c3ff);
+  border: none;
+  border-radius: 6px;
+  color: #f4f7f9;
+  font-weight: bold;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.read-more-btn:hover {
+  background: linear-gradient(90deg, #00c3ff, #00ff95);
+}
 
