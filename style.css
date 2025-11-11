@@ -1074,7 +1074,7 @@ footer {
 .news-item:hover {
     transform: translateY(-6px);
     box-shadow: 0 8px 32px rgba(145, 4, 4, 0.12);
-    background: #ffffff;
+     background: #0e48ba;
 }
 
 .news-item strong {
@@ -1331,6 +1331,7 @@ body.dark-mode {
 .read-more-btn:hover {
   background: linear-gradient(90deg, #00c3ff, #00ff95);
 }
+
 
 
 
