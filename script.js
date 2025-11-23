@@ -152,8 +152,10 @@
   fetchTickerPrices();
   setInterval(fetchTickerPrices, 60 * 1000);
 
- // ----- Crypto News ----- //
-// ----- Crypto News ----- //
+
+
+
+  // ----- Crypto News ----- //
 let newsFetching = false;
 const fetchCryptoNews = async () => {
   if (!els.newsGrid || newsFetching) return;
@@ -172,6 +174,7 @@ const fetchCryptoNews = async () => {
 
         const imageUrl = news.imageurl || 'https://via.placeholder.com/150';
         const publishedDate = new Date(news.published_on * 1000).toLocaleString();
+        const articleUrl = news.url;
 
         newsItem.innerHTML = `
           <img src="${imageUrl}" alt="${news.title}" class="news-image">
@@ -180,17 +183,33 @@ const fetchCryptoNews = async () => {
           <p class="news-full hidden">${news.body}</p>
           <p class="news-date">🕒 ${publishedDate}</p>
           <button class="read-more-btn">Read More</button>
+          <button class="copy-link-btn" data-url="https://cryptochapter.onrender.com" aria-label="Copy article link">📋 Copy Link</button>
         `;
 
         els.newsGrid.appendChild(newsItem);
       });
 
-      // Enable Read More / Read Less functionality
+      // ----- Enable Read More / Read Less -----
       els.newsGrid.querySelectorAll('.read-more-btn').forEach(button => {
         button.addEventListener('click', () => {
           const fullText = button.parentElement.querySelector('.news-full');
           fullText.classList.toggle('hidden');
           button.textContent = fullText.classList.contains('hidden') ? 'Read More' : 'Read Less';
+        });
+      });
+
+      // ----- Enable Copy Link -----
+      els.newsGrid.querySelectorAll('.copy-link-btn').forEach(button => {
+        button.addEventListener('click', async () => {
+          const url = button.getAttribute('data-url');
+          try {
+            await navigator.clipboard.writeText(url);
+            button.textContent = '✅ Copied!';
+            setTimeout(() => (button.textContent = '📋 Copy Link'), 2000);
+          } catch (err) {
+            console.error('Clipboard error:', err);
+            button.textContent = '❌ Error';
+          }
         });
       });
     } else {
@@ -210,6 +229,7 @@ setInterval(fetchCryptoNews, 5 * 60 * 1000);
 
 
 
+
   // ----- Dark Mode ----- //
   if (els.themeToggle) {
     if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
@@ -223,3 +243,76 @@ setInterval(fetchCryptoNews, 5 * 60 * 1000);
 
 
 
+
+
+// ====== Market Data Ticker Script ======
+const ticker = document.getElementById("marketTickerInner");
+
+async function fetchMarketData() {
+  try {
+    // Fetching Global Data (Market Cap, Volume, BTC Dominance)
+    const globalRes = await fetch("https://api.coingecko.com/api/v3/global");
+    const globalData = await globalRes.json();
+    const mcap = (globalData.data.total_market_cap.usd / 1e9).toFixed(2);
+    const volume = (globalData.data.total_volume.usd / 1e9).toFixed(2);
+    const btcDom = globalData.data.market_cap_percentage.btc.toFixed(1);
+
+    // Fetching Fear & Greed Index
+    const fearRes = await fetch("https://api.alternative.me/fng/?limit=1");
+    const fearData = await fearRes.json();
+    const fearIndex = fearData.data[0].value;
+    const fearClassification = fearData.data[0].value_classification;
+
+    // Construct the ticker content (without news)
+    ticker.innerHTML = `
+      <div class="market-data">🌍 <strong>Total Market Cap:</strong> <span>$${mcap}B</span></div>
+      <div class="market-data">📊 <strong>24H Volume:</strong> <span>$${volume}B</span></div>
+      <div class="market-data">💰 <strong>BTC Dominance:</strong> <span>${btcDom}%</span></div>
+      <div class="market-data">😱 <strong>Fear & Greed Index:</strong> 
+        <span>${fearIndex} (${fearClassification})</span>
+      </div>
+    `;
+  } catch (error) {
+    console.error("Error fetching market data:", error);
+    ticker.innerHTML = "Unable to load market data at this time.";
+  }
+}
+
+// Fetch immediately and refresh every 5 minutes
+fetchMarketData();
+setInterval(fetchMarketData, 300000);
+
+
+
+// ====== Crypto News Ticker Script (No External Links) ======
+const newsTicker = document.getElementById("newsTickerInner");
+
+async function fetchCryptoNews() {
+  try {
+    // Fetch free crypto news from CryptoCompare
+    const res = await fetch("https://min-api.cryptocompare.com/data/v2/news/?lang=EN");
+    const data = await res.json();
+
+    // Take top 10 news headlines
+    const newsList = data.Data.slice(0, 10);
+
+    // Build ticker HTML without links
+    newsTicker.innerHTML = newsList
+      .map(
+        (item) => `
+          <div class="news-item">
+            📰 <strong>${item.source_info.name}:</strong> 
+            ${item.title}
+          </div>
+        `
+      )
+      .join("");
+  } catch (error) {
+    console.error("Error fetching crypto news:", error);
+    newsTicker.innerHTML = "Unable to load crypto news at this time.";
+  }
+}
+
+// Fetch immediately and refresh every 10 minutes
+fetchCryptoNews();
+setInterval(fetchCryptoNews, 600000);
