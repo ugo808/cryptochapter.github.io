@@ -662,11 +662,7 @@ footer {
     .navbar.active .nav-links a:nth-child(3) { transition-delay: 0.3s; }
     .navbar.active .nav-links a:nth-child(4) { transition-delay: 0.4s; }
 
-    .connect-wallet {
-        width: 100%;
-        max-width: none;
-        margin-top: 10px;
-    }
+    
 }
 
     /* Chat Container */
@@ -684,6 +680,26 @@ footer {
     #chatInput {
         font-size: 12px;
     }
+
+
+.bot-message {
+  color: #1e90ff; /* Text color (blue) */
+  background: #f0f8ff;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.bot-message a {
+  color: #ff4500; /* Link color (orange) */
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.bot-message a:hover {
+  text-decoration: underline;
+}
+
 
     #sendMessage {
         font-size: 12px;
@@ -1563,6 +1579,7 @@ body.dark .copy-link-btn {
 .dark-mode .crypto-list li {
   background: #2a2a2a;
 }
+
 
 
 
