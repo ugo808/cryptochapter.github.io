@@ -1,318 +1,317 @@
-(() => {
-  // ----- DOM Elements Cache ----- //
-  const els = {
-    hamburger: document.querySelector('.hamburger'),
-    navbar: document.querySelector('.navbar'),
-    navLinks: document.querySelectorAll('.nav-links a'),
-    getStarted: document.querySelector('.get-started'),
-    watchVideo: document.querySelector('.watch-video'),
-    walletStatusContainer: document.querySelector('header nav'),
-    connectBtn: document.querySelector('.connect-wallet'),
-    chatToggle: document.querySelector('.chat-bot-toggle'),
-    chatContainer: document.querySelector('#chatBot'),
-    closeChat: document.querySelector('.close-chat'),
-    chatMessages: document.querySelector('#chatMessages'),
-    chatInput: document.querySelector('#chatInput'),
-    sendMessage: document.querySelector('#sendMessage'),
-    themeToggle: document.getElementById('themeToggle'),
-    newsGrid: document.getElementById('newsGrid'),
-    priceTickerInner: document.getElementById('priceTickerInner')
-  };
+document.addEventListener('DOMContentLoaded', () => {
+    const hamburger = document.getElementById('hamburger-btn');
+    const navMenu = document.getElementById('nav-menu');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = themeToggle.querySelector('.theme-icon');
 
-  // ----- Mobile Menu Handling ----- //
-  const toggleMenu = () => {
-    els.hamburger.classList.toggle('active');
-    els.navbar.classList.toggle('active');
+    // Theme Toggle Logic
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
 
-    const isExpanded = els.hamburger.classList.contains('active');
-    els.hamburger.setAttribute('aria-expanded', isExpanded);
-    document.body.style.overflow = isExpanded ? 'hidden' : '';
-  };
-
-  if (els.hamburger && els.navbar) {
-    els.hamburger.addEventListener('click', toggleMenu);
-    els.navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        if (els.navbar.classList.contains('active')) toggleMenu();
-      });
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
     });
-  }
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && els.navbar.classList.contains('active')) toggleMenu();
-  });
-
-  // ----- Button Click Handlers ----- //
-  els.getStarted?.addEventListener('click', () => {
-    alert('Get Started clicked! This will take you to the next step.');
-  });
-
-  els.watchVideo?.addEventListener('click', () => {
-    alert('Watch Video clicked! This will play a demo video.');
-  });
-
-  // ----- Wallet Status ----- //
-  let walletStatus = document.getElementById('walletStatus');
-  if (!walletStatus) {
-    walletStatus = document.createElement('div');
-    walletStatus.id = 'walletStatus';
-    walletStatus.classList.add('wallet-status'); // style via CSS
-    els.walletStatusContainer?.appendChild(walletStatus);
-  }
-
-  async function connectToMetaMask() {
-    walletStatus.textContent = '';
-    if (typeof window.ethereum === 'undefined') {
-      walletStatus.textContent = 'MetaMask not installed.';
-      console.error('MetaMask not installed.');
-      return null;
+    function updateThemeIcon(theme) {
+        themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
     }
 
-    try {
-      walletStatus.textContent = 'Connecting...';
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const walletAddress = accounts[0];
-      walletStatus.textContent = `Connected: ${walletAddress.slice(0,6)}...${walletAddress.slice(-4)}`;
-      return walletAddress;
-    } catch (err) {
-      walletStatus.textContent = 'Connection rejected or failed.';
-      console.error('MetaMask connection error:', err);
-      return null;
-    }
-  }
+    // Toggle Menu
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+        
+        // Prevent scrolling when menu is open
+        document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : 'auto';
+    });
 
-  els.connectBtn?.addEventListener('click', connectToMetaMask);
+    // Close menu when clicking a link
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+    });
 
-  // ----- Chat Bot ----- //
-  const addMessage = (message, className, isHTML = false) => {
-    const msg = document.createElement('p');
-    if (isHTML) msg.innerHTML = message;
-    else msg.textContent = message;
-    msg.classList.add(className);
-    els.chatMessages.appendChild(msg);
-    els.chatMessages.scrollTop = els.chatMessages.scrollHeight;
-  };
-
-  const botReply = () => {
-    const replyHTML = `
-      We are not available right now.<br><br>
-      You can contact us through:<br>
-      📱 <a href="https://wa.me/2347066749320" target="_blank">WhatsApp</a><br>
-      💬 <a href="https://t.me/@Ugomiracle" target="_blank">Telegram</a><br>
-      📘 <a href="" target="_blank">Facebook</a><br>
-      📸 <a href="" target="_blank">Instagram</a>
-    `;
-    addMessage(replyHTML, 'bot-message', true);
-  };
-
-  els.chatToggle?.addEventListener('click', () => els.chatContainer?.classList.add('active'));
-  els.closeChat?.addEventListener('click', () => els.chatContainer?.classList.remove('active'));
-
-  const sendChat = () => {
-    const text = els.chatInput.value.trim();
-    if (!text) return;
-    addMessage(`You: ${text}`, 'user-message');
-    els.chatInput.value = '';
-    setTimeout(botReply, 500);
-  };
-
-  els.sendMessage?.addEventListener('click', sendChat);
-  els.chatInput?.addEventListener('keypress', e => {
-    if (e.key === 'Enter') sendChat();
-  });
-
-  // ----- Crypto Prices Ticker ----- //
-  const fetchTickerPrices = async () => {
-    if (!els.priceTickerInner) return;
-    const ids = ['bitcoin','ethereum','binancecoin','solana','ripple','cardano','dogecoin','tron','polygon','polkadot','litecoin'];
-    const url = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids.join(',')}&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=24h`;
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      const items = ids.map(id => {
-        const coin = data.find(c => c.id === id);
-        const name = coin?.name || id.charAt(0).toUpperCase() + id.slice(1);
-        const symbol = coin?.symbol?.toUpperCase() || name[0];
-        const price = coin?.current_price != null ? Number(coin.current_price).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
-        const changeVal = coin?.price_change_percentage_24h;
-        let changeHTML = '';
-        if (changeVal != null) {
-          const sign = changeVal > 0 ? '+' : '';
-          const cls = changeVal > 0 ? 'price-up' : changeVal < 0 ? 'price-down' : 'price-neutral';
-          changeHTML = ` <span class="change ${cls}">(${sign}${changeVal.toFixed(2)}%)</span>`;
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!hamburger.contains(e.target) && !navMenu.contains(e.target) && navMenu.classList.contains('active')) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.style.overflow = 'auto';
         }
-        return `<span class="price-ticker__item"><span class="symbol">${symbol}</span><span class="pair">${name}</span><span class="price">$${price}</span>${changeHTML}</span>`;
-      }).join('');
-      els.priceTickerInner.innerHTML = items + items;
-    } catch (err) {
-      els.priceTickerInner.textContent = 'Failed to load ticker.';
-      console.error('Ticker fetch error', err);
-    }
-  };
-  fetchTickerPrices();
-  setInterval(fetchTickerPrices, 60 * 1000);
-
-
-
-
-  // ----- Crypto News ----- //
-let newsFetching = false;
-const fetchCryptoNews = async () => {
-  if (!els.newsGrid || newsFetching) return;
-  newsFetching = true;
-  els.newsGrid.innerHTML = '<div class="news-loading">Loading latest crypto news...</div>';
-
-  try {
-    const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
-    const data = await res.json();
-    els.newsGrid.innerHTML = '';
-
-    if (data.Data?.length) {
-      data.Data.slice(0, 20).forEach(news => {
-        const newsItem = document.createElement('article');
-        newsItem.className = 'news-item';
-
-        const imageUrl = news.imageurl || 'https://via.placeholder.com/150';
-        const publishedDate = new Date(news.published_on * 1000).toLocaleString();
-        const articleUrl = news.url;
-
-        newsItem.innerHTML = `
-          <img src="${imageUrl}" alt="${news.title}" class="news-image">
-          <h3>${news.title}</h3>
-          <p class="news-preview">${news.body.slice(0, 120)}...</p>
-          <p class="news-full hidden">${news.body}</p>
-          <p class="news-date">🕒 ${publishedDate}</p>
-          <button class="read-more-btn">Read More</button>
-          <button class="copy-link-btn" data-url="https://cryptochapter.onrender.com" aria-label="Copy article link">📋 Copy Link</button>
-        `;
-
-        els.newsGrid.appendChild(newsItem);
-      });
-
-      // ----- Enable Read More / Read Less -----
-      els.newsGrid.querySelectorAll('.read-more-btn').forEach(button => {
-        button.addEventListener('click', () => {
-          const fullText = button.parentElement.querySelector('.news-full');
-          fullText.classList.toggle('hidden');
-          button.textContent = fullText.classList.contains('hidden') ? 'Read More' : 'Read Less';
-        });
-      });
-
-      // ----- Enable Copy Link -----
-      els.newsGrid.querySelectorAll('.copy-link-btn').forEach(button => {
-        button.addEventListener('click', async () => {
-          const url = button.getAttribute('data-url');
-          try {
-            await navigator.clipboard.writeText(url);
-            button.textContent = '✅ Copied!';
-            setTimeout(() => (button.textContent = '📋 Copy Link'), 2000);
-          } catch (err) {
-            console.error('Clipboard error:', err);
-            button.textContent = '❌ Error';
-          }
-        });
-      });
-    } else {
-      els.newsGrid.innerHTML = '<div class="news-loading">No news available at the moment.</div>';
-    }
-  } catch (err) {
-    console.error('Error fetching news:', err);
-    els.newsGrid.innerHTML = '<div class="news-error">⚠️ Unable to load news. Please try again later.</div>';
-  } finally {
-    newsFetching = false;
-  }
-};
-
-// Initial load and auto-refresh every 5 minutes
-fetchCryptoNews();
-setInterval(fetchCryptoNews, 5 * 60 * 1000);
-
-
-
-
-  // ----- Dark Mode ----- //
-  if (els.themeToggle) {
-    if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-    els.themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
     });
-  }
-})();
 
+    // Crypto Ticker
+    const tickerContainer = document.getElementById('crypto-ticker');
+    
+    // Fallback data in case API fails (e.g. CORS on local file)
+    const fallbackData = [
+        { symbol: 'BTC', priceUsd: '98500.00', changePercent24Hr: '2.5' },
+        { symbol: 'ETH', priceUsd: '3800.00', changePercent24Hr: '1.2' },
+        { symbol: 'SOL', priceUsd: '145.00', changePercent24Hr: '-0.5' },
+        { symbol: 'XRP', priceUsd: '0.65', changePercent24Hr: '0.1' },
+        { symbol: 'ADA', priceUsd: '0.45', changePercent24Hr: '-1.2' },
+        { symbol: 'DOGE', priceUsd: '0.12', changePercent24Hr: '5.0' },
+        { symbol: 'DOT', priceUsd: '7.50', changePercent24Hr: '-2.1' },
+        { symbol: 'AVAX', priceUsd: '35.00', changePercent24Hr: '1.5' },
+        { symbol: 'LINK', priceUsd: '18.00', changePercent24Hr: '3.2' },
+        { symbol: 'MATIC', priceUsd: '0.85', changePercent24Hr: '-0.8' }
+    ];
 
+    function renderTicker(coins) {
+        tickerContainer.innerHTML = '';
+        
+        // Create items
+        const items = coins.map(coin => {
+            const price = parseFloat(coin.priceUsd).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            const change = parseFloat(coin.changePercent24Hr).toFixed(2);
+            const isPositive = parseFloat(coin.changePercent24Hr) >= 0;
+            const changeClass = isPositive ? 'positive' : 'negative';
+            const changeSign = isPositive ? '+' : '';
 
+            return `
+                <div class="ticker-item">
+                    <span class="ticker-symbol">${coin.symbol}</span>
+                    <span class="ticker-price">${price}</span>
+                    <span class="ticker-change ${changeClass}">${changeSign}${change}%</span>
+                </div>
+            `;
+        }).join('');
 
+        // Duplicate content to ensure smooth infinite scroll
+        tickerContainer.innerHTML = items + items; 
+    }
 
+    async function fetchCryptoPrices() {
+        try {
+            const response = await fetch('https://api.coincap.io/v2/assets?limit=100');
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            
+            if (data.data && data.data.length > 0) {
+                renderTicker(data.data);
+                renderSidebar(data.data);
+            } else {
+                throw new Error('No data received');
+            }
+        } catch (error) {
+            console.warn('Error fetching crypto data, using fallback:', error);
+            renderTicker(fallbackData);
+            renderSidebar(fallbackData);
+        }
+    }
 
-// ====== Market Data Ticker Script ======
-const ticker = document.getElementById("marketTickerInner");
+    function renderSidebar(coins) {
+        // 1. Top Gainers & Losers
+        const sortedByChange = [...coins].sort((a, b) => parseFloat(b.changePercent24Hr) - parseFloat(a.changePercent24Hr));
+        const topGainers = sortedByChange.slice(0, 5);
+        const topLosers = sortedByChange.slice(-5).reverse();
 
-async function fetchMarketData() {
-  try {
-    // Fetching Global Data (Market Cap, Volume, BTC Dominance)
-    const globalRes = await fetch("https://api.coingecko.com/api/v3/global");
-    const globalData = await globalRes.json();
-    const mcap = (globalData.data.total_market_cap.usd / 1e9).toFixed(2);
-    const volume = (globalData.data.total_volume.usd / 1e9).toFixed(2);
-    const btcDom = globalData.data.market_cap_percentage.btc.toFixed(1);
+        renderCoinList('top-gainers', topGainers);
+        renderCoinList('top-losers', topLosers);
 
-    // Fetching Fear & Greed Index
-    const fearRes = await fetch("https://api.alternative.me/fng/?limit=1");
-    const fearData = await fearRes.json();
-    const fearIndex = fearData.data[0].value;
-    const fearClassification = fearData.data[0].value_classification;
+        // 2. BTC Dominance (Estimate based on top 100)
+        const totalCap = coins.reduce((acc, coin) => acc + parseFloat(coin.marketCapUsd), 0);
+        const btcCoin = coins.find(c => c.symbol === 'BTC');
+        if (btcCoin) {
+            const btcCap = parseFloat(btcCoin.marketCapUsd);
+            const btcDominance = ((btcCap / totalCap) * 100).toFixed(1) + '%';
+            const btcDomEl = document.getElementById('btc-dominance');
+            if (btcDomEl) btcDomEl.textContent = btcDominance;
+        }
 
-    // Construct the ticker content (without news)
-    ticker.innerHTML = `
-      <div class="market-data">🌍 <strong>Total Market Cap:</strong> <span>$${mcap}B</span></div>
-      <div class="market-data">📊 <strong>24H Volume:</strong> <span>$${volume}B</span></div>
-      <div class="market-data">💰 <strong>BTC Dominance:</strong> <span>${btcDom}%</span></div>
-      <div class="market-data">😱 <strong>Fear & Greed Index:</strong> 
-        <span>${fearIndex} (${fearClassification})</span>
-      </div>
-    `;
-  } catch (error) {
-    console.error("Error fetching market data:", error);
-    ticker.innerHTML = "Unable to load market data at this time.";
-  }
-}
+        // 3. Altcoin Index (Mock/Proxy)
+        const altIndexEl = document.getElementById('altcoin-index');
+        if (altIndexEl) altIndexEl.textContent = '45/100 (Neutral)';
+    }
 
-// Fetch immediately and refresh every 5 minutes
-fetchMarketData();
-setInterval(fetchMarketData, 300000);
+    function renderCoinList(elementId, coins) {
+        const list = document.getElementById(elementId);
+        if (!list) return;
+        
+        list.innerHTML = coins.map(coin => {
+            const change = parseFloat(coin.changePercent24Hr).toFixed(2);
+            const isPositive = parseFloat(coin.changePercent24Hr) >= 0;
+            const changeClass = isPositive ? 'positive' : 'negative';
+            const changeSign = isPositive ? '+' : '';
+            
+            return `
+                <li>
+                    <div class="coin-info">
+                        <span class="coin-symbol">${coin.symbol}</span>
+                        <span style="color: var(--text-muted); font-size: 0.8em;">$${parseFloat(coin.priceUsd).toFixed(2)}</span>
+                    </div>
+                    <span class="coin-change ${changeClass}">${changeSign}${change}%</span>
+                </li>
+            `;
+        }).join('');
+    }
 
+    async function fetchFearGreed() {
+        try {
+            const response = await fetch('https://api.alternative.me/fng/');
+            const data = await response.json();
+            const fng = data.data[0];
+            
+            const valueEl = document.getElementById('fg-value');
+            const labelEl = document.getElementById('fg-label');
+            
+            if (valueEl && labelEl) {
+                valueEl.textContent = fng.value;
+                labelEl.textContent = fng.value_classification;
+                
+                if (fng.value >= 75) valueEl.style.color = '#10b981';
+                else if (fng.value >= 50) valueEl.style.color = '#3b82f6';
+                else if (fng.value >= 25) valueEl.style.color = '#f59e0b';
+                else valueEl.style.color = '#ef4444';
+            }
+        } catch (error) {
+            console.error('Error fetching Fear & Greed:', error);
+            const labelEl = document.getElementById('fg-label');
+            if (labelEl) labelEl.textContent = 'Unavailable';
+        }
+    }
 
+    fetchCryptoPrices();
+    fetchFearGreed();
+    setInterval(fetchCryptoPrices, 60000);
 
-// ====== Crypto News Ticker Script (No External Links) ======
-const newsTicker = document.getElementById("newsTickerInner");
+    // Chatbot Logic
+    const chatWidget = document.querySelector('.chat-widget');
+    const chatToggle = document.getElementById('chat-toggle');
+    const chatInput = document.getElementById('chat-input');
+    const chatSend = document.getElementById('chat-send');
+    const chatMessages = document.getElementById('chat-messages');
 
-async function fetchCryptoNews() {
-  try {
-    // Fetch free crypto news from CryptoCompare
-    const res = await fetch("https://min-api.cryptocompare.com/data/v2/news/?lang=EN");
-    const data = await res.json();
+    if (chatToggle) {
+        chatToggle.addEventListener('click', () => {
+            chatWidget.classList.toggle('active');
+        });
+    }
 
-    // Take top 10 news headlines
-    const newsList = data.Data.slice(0, 10);
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender);
+        messageDiv.innerHTML = `<p>${text}</p>`;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
-    // Build ticker HTML without links
-    newsTicker.innerHTML = newsList
-      .map(
-        (item) => `
-          <div class="news-item">
-            📰 <strong>${item.source_info.name}:</strong> 
-            ${item.title}
-          </div>
-        `
-      )
-      .join("");
-  } catch (error) {
-    console.error("Error fetching crypto news:", error);
-    newsTicker.innerHTML = "Unable to load crypto news at this time.";
-  }
-}
+    function handleSend() {
+        const text = chatInput.value.trim();
+        if (text) {
+            addMessage(text, 'user');
+            chatInput.value = '';
+            
+            setTimeout(() => {
+                const responses = [
+                    "That's interesting! Tell me more.",
+                    "I can help you check the latest market trends.",
+                    "Have you seen the Bitcoin price today?",
+                    "Our support team will contact you shortly.",
+                    "To connect your wallet, click the button in the header."
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                addMessage(randomResponse, 'bot');
+            }, 1000);
+        }
+    }
 
-// Fetch immediately and refresh every 10 minutes
-fetchCryptoNews();
-setInterval(fetchCryptoNews, 600000);
+    if (chatSend) {
+        chatSend.addEventListener('click', handleSend);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+    }
+
+    // Dynamic News Feed
+    const newsGrid = document.getElementById('news-grid');
+    
+    async function fetchNews() {
+        if (!newsGrid) return;
+        
+        try {
+            const response = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
+            const data = await response.json();
+            
+            if (data.Data && data.Data.length > 0) {
+                renderNews(data.Data.slice(0, 6)); // Show top 6 news items
+            } else {
+                newsGrid.innerHTML = '<p>No news available at the moment.</p>';
+            }
+        } catch (error) {
+            console.error('Error fetching news:', error);
+            newsGrid.innerHTML = '<p>Failed to load news. Please try again later.</p>';
+        }
+    }
+
+    function renderNews(newsItems) {
+        newsGrid.innerHTML = ''; // Clear loading/existing content
+        
+        newsItems.forEach(item => {
+            const date = new Date(item.published_on * 1000);
+            const timeAgo = getTimeAgo(date);
+            
+            const newsCard = document.createElement('article');
+            newsCard.className = 'news-card';
+            
+            newsCard.innerHTML = `
+                <div class="card-image" style="background-image: url('${item.imageurl}'); background-size: cover; background-position: center;"></div>
+                <div class="card-content">
+                    <span class="category">${item.categories.split('|')[0]}</span>
+                    <h3><a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a></h3>
+                    <p>${item.body.substring(0, 100)}...</p>
+                    <div class="card-meta">
+                        <span>${timeAgo}</span>
+                        <span>•</span>
+                        <span>${item.source_info.name}</span>
+                    </div>
+                </div>
+            `;
+            
+            newsGrid.appendChild(newsCard);
+        });
+    }
+
+    function getTimeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        
+        let interval = seconds / 31536000;
+        if (interval > 1) return Math.floor(interval) + " years ago";
+        
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + " months ago";
+        
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + " days ago";
+        
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + " hours ago";
+        
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + " minutes ago";
+        
+        return Math.floor(seconds) + " seconds ago";
+    }
+
+    // Initial fetch
+    fetchNews();
+
+    // Refresh news every 60 seconds
+    setInterval(fetchNews, 60000);
+});
